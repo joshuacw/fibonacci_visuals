@@ -1,5 +1,8 @@
-import scipy.constants, argparse
+import scipy.constants
+import argparse
+import decimal
 from bokeh.plotting import figure, output_file, show
+decimal.getcontext().prec = 1000
 
 phi = scipy.constants.golden
 
@@ -11,15 +14,15 @@ args = parser.parse_args()
 def nth_term(term):
     return int(round((phi**term - (1 - phi)**term) / 5**0.5))
 
-print "The number {0} term in the Fibonacci sequence is {1}.".format(int(args.integer), nth_term(args.integer))
-
-def fib_list(term): #produces a list of the first N Fibonacci terms 
+#produces a list of the first N Fibonacci terms
+def fib_list(term): 
     fib_list = [0, 1]
-    for i in range(2, term + 1): 
+    for i in range(2, term + 1):
         fib_list.append(fib_list[i - 1] + fib_list[i - 2])
-    return fib_list 
+    return fib_list
 
-def prime_list(term): #produces a list of the first N prime numbers
+#produces a list of the first N prime numbers
+def prime_list(term): 
     prime_list = [2]
     number = 3
 
@@ -34,6 +37,28 @@ def prime_list(term): #produces a list of the first N prime numbers
             prime_list.append(number)
         number += 1
     return prime_list
+
+# check how many digits quotient of last 2 terms matches phi out to
+def phi_match(term):
+    phi1000list = []
+    phi_dec_list = []
+    with open('phi1000.txt', 'r') as phi:
+        phi1000 = phi.read()
+        phi_dec = str(decimal.Decimal(nth_term(term)) / decimal.Decimal(nth_term(term - 1)))
+
+        for char in phi1000:
+            phi1000list.append(char)
+
+        for char in phi_dec: 
+            phi_dec_list.append(char)
+
+    for i in range(1001):
+        if(phi1000list[i] == phi_dec_list[i]):
+            i += 1
+        else:
+            break
+
+    return i - 1
 
 #data for graph
 x = range(args.integer + 1)
@@ -54,6 +79,8 @@ p.line(x, y1, legend="Prime number terms", line_width=3, line_color="blue", line
 show(p)
 
 print ""
+print "The number {0} term in the Fibonacci sequence is {1}.".format(int(args.integer), nth_term(args.integer))
+print ""
 print "The first terms of the Fibonacci sequence out to term {} are:".format(int(args.integer))
 print fib_list(args.integer)
 print "The first terms of prime numbers out to term {} are:".format(int(args.integer))
@@ -61,3 +88,5 @@ print prime_list(args.integer)
 print ""
 print "The value of the quotient of the last two terms in the sequence is: {}".format(float(y[args.integer]) / float(y[args.integer - 1]))
 print "The true value of phi is: {}".format(phi)
+print ""
+print "The quotient of the last two terms of the sequence match the true value of phi out to {} digits.".format(phi_match(args.integer))

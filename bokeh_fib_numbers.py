@@ -2,6 +2,7 @@ import scipy.constants
 import argparse
 import decimal
 from bokeh.plotting import figure, output_file, show
+from fib_math.functions import nth_term, fib_list, prime_list, phi_match
 decimal.getcontext().prec = 1000
 
 phi = scipy.constants.golden
@@ -9,56 +10,6 @@ phi = scipy.constants.golden
 parser = argparse.ArgumentParser(description="A visual display of the Fibonacci sequence.")
 parser.add_argument("integer", type = int, help = "Type in the number of Fibonacci terms to be shown.")
 args = parser.parse_args()
-
-#implementing Binet's formula to produce the Nth term
-def nth_term(term):
-    return int(round((phi**term - (1 - phi)**term) / 5**0.5))
-
-#produces a list of the first N Fibonacci terms
-def fib_list(term): 
-    fib_list = [0, 1]
-    for i in range(2, term + 1):
-        fib_list.append(fib_list[i - 1] + fib_list[i - 2])
-    return fib_list
-
-#produces a list of the first N prime numbers
-def prime_list(term): 
-    prime_list = [2]
-    number = 3
-
-    while len(prime_list) < term + 1:
-        counter = 0
-        for n in range(2, number):
-            if number % n == 0:
-                counter += 1
-            else:
-                counter += 0
-        if counter == 0:
-            prime_list.append(number)
-        number += 1
-    return prime_list
-
-# check how many digits quotient of last 2 terms matches phi out to
-def phi_match(term):
-    phi1000list = []
-    phi_dec_list = []
-    with open('phi1000.txt', 'r') as phi:
-        phi1000 = phi.read()
-        phi_dec = str(decimal.Decimal(nth_term(term)) / decimal.Decimal(nth_term(term - 1)))
-
-        for char in phi1000:
-            phi1000list.append(char)
-
-        for char in phi_dec: 
-            phi_dec_list.append(char)
-
-    for i in range(1001):
-        if(phi1000list[i] == phi_dec_list[i]):
-            i += 1
-        else:
-            break
-
-    return i - 1
 
 #data for graph
 x = range(args.integer + 1)
@@ -77,6 +28,10 @@ p.line(x, y1, legend="Prime number terms", line_width=3, line_color="blue", line
 
 #show results
 show(p)
+
+'''
+can use python's map function to produce a list of terms for phi_match function
+'''
 
 print ""
 print "The number {0} term in the Fibonacci sequence is {1}.".format(int(args.integer), nth_term(args.integer))

@@ -1,8 +1,5 @@
 import scipy.constants
 import decimal
-decimal.getcontext().prec = 1000
-my_context = decimal.Context(prec=1000)
-decimal.setcontext(my_context)
 
 #implementing Binet's formula to produce the Nth term
 def nth_term(term):
@@ -38,8 +35,8 @@ def prime_list(term):
 def phi_match(term):
     phi1000list = []
     phi_dec_list = []
-    ten_places = decimal.Decimal(10) ** -999
-#    my_context = decimal.Context(prec = 1001)
+    thousand_places = decimal.Decimal(10) ** -999
+    my_context = decimal.Context(prec=1000)
     decimal.setcontext(my_context)
     with open('phi1000.txt', 'r') as phi:
         phi1000 = phi.read()
@@ -47,7 +44,7 @@ def phi_match(term):
         for char in phi1000:
             phi1000list.append(char)
 
-        phi_dec = str(decimal.Decimal(nth_term(term) / nth_term(term - 1)).quantize(ten_places))
+        phi_dec = str(decimal.Decimal(nth_term(term) / nth_term(term - 1)).quantize(thousand_places))
         for char in phi_dec: 
             phi_dec_list.append(char)
 

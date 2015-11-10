@@ -1,5 +1,7 @@
 import decimal
 
+#calculate nth term recursively in n steps
+#may still need to try another algorithm for better accuracy
 def nth_term(term):
     a, b = decimal.Decimal(0), decimal.Decimal(1)
     for i in range(term):

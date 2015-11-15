@@ -35,20 +35,22 @@ def prime_list(term):
 def phi_match(term): 
     phi1000list = []
     phi_dec_list = []
-    decimal.getcontext().prec = 1000
+    thousand_places = decimal.Decimal(10) ** -999
+    my_context = decimal.Context(prec=1000)
+    decimal.setcontext(my_context)
     with open('phi1000.txt', 'r') as phi:
         phi1000 = phi.read()
 
         for char in phi1000:
             phi1000list.append(char)
 
-        phi_dec = str(decimal.Decimal(nth_term(term) / nth_term(term - 1))) 
+        phi_dec = str(decimal.Decimal(nth_term(term) / nth_term(term - 1)).quantize(thousand_places)) 
         for char in phi_dec: 
             phi_dec_list.append(char)
 
     i = 0
-    while(phi1000list[i] == phi_dec_list[i]):
-        i += 1
+    while phi1000list[i] == phi_dec_list[i]:
+           i += 1 
 
     if term == 3:
         return 0

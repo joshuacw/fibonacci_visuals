@@ -1,6 +1,5 @@
 import scipy.constants
 import argparse
-import decimal
 from bokeh.plotting import figure, output_file, show
 from bokeh.charts import Bar, output_file, show
 from fib_math.functions import nth_term, fib_list, prime_list, phi_match
@@ -11,12 +10,16 @@ parser = argparse.ArgumentParser(description= \
         "A visual display of the Fibonacci sequence.")
 parser.add_argument("integer", type = int, help = \
         "Type in the number of Fibonacci terms to be shown.")
+parser.add_argument('--debug', '--d', action = 'store_true')
 args = parser.parse_args()
 
 #data for graph
 x = range(args.integer + 1)
 y = fib_list(args.integer)
 y1 = prime_list(args.integer)
+
+x1 = range(2, args.integer + 1)
+y2 = map(phi_match, range(2, args.integer + 1)) 
 
 #output to static HTML file
 output_file("lines.html", title="Growth of Fibonacci Sequence")
@@ -32,7 +35,7 @@ p.line(x, y1, legend="Prime number terms", \
         line_width=3, line_color="blue", line_dash="4 4")
 
 #show results
-show(p)
+#show(p)
 '''
 can use python's map function to produce a list of terms for phi_match function
 '''

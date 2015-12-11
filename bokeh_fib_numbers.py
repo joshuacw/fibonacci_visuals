@@ -2,14 +2,17 @@ import scipy.constants
 import argparse
 from bokeh.io import hplot
 from bokeh.plotting import figure, output_file, show
-from fib_math.functions import nth_term, fib_list, prime_list, phi_compare
+from bokeh.models import HoverTool
+from fib_math.functions import nth_term, fib_list, prime_list, phi_compare,\
+        get_n_squares, get_axis_range, get_spiral_coord
 
 phi = scipy.constants.golden
 
 parser = argparse.ArgumentParser(description= \
         "A visual display of the Fibonacci sequence.")
 parser.add_argument("integer", type = int, help = \
-        "Type in the number of Fibonacci terms to be shown.")
+        "Type in the number of Fibonacci terms to be shown. \
+        Any integer >= 2 will work.")
 parser.add_argument('--debug', '-d', action = 'store_true')
 args = parser.parse_args()
 
@@ -33,7 +36,8 @@ if args.debug:
         .format(float(y_fib[args.integer]) / float(y_fib[args.integer - 1]))
     print "The true value of phi is: {}".format(phi)
     print ""
-    print "The quotient of the last two terms of the sequence match the true value of phi out to {} digits."\
+    print "The quotient of the last two terms of the sequence match \
+            the true value of phi out to {} digits."\
         .format(phi_compare(args.integer))
 
 else:
@@ -52,19 +56,42 @@ else:
     output_file("layout.html", title="Fibonacci Fun")
 
     # creating Fibonacci and prime number growth plot 
-    s1 = figure(plot_width=600, plot_height=600, title="Growth of Fibonacci Sequence vs. Prime numbers", \
-        x_axis_label='Term number', y_axis_label='Value')
+    s1 = figure(plot_width=400, plot_height=400, \
+            title="Growth of Fibonacci Sequence vs. Prime numbers",\
+            title_text_font_size = "12pt",
+        x_axis_label='Fibonacci term number', y_axis_label='Value')
     s1.line(x_growth, y_fib, legend="Fibonacci terms", line_width=2, line_color="red")
     s1.line(x_growth, y_prime, legend="Prime number terms", \
         line_width=3, line_color="blue", line_dash="4 4")
 
     # Create phi-comparison plot
-    s2 = figure(plot_width=600, plot_height=600, title='Phi Estimate vs. Phi', \
-        x_axis_label= 'Fibonacci term number', y_axis_label='Matching Digit')
+    hover = HoverTool(tooltips = [
+        ("F(n) / F(n - 1) matches phi to", "$y digits")
+                                ] 
+                    )
+    s2 = figure(plot_width=400, plot_height=400, title='Phi Estimate vs. Phi', \
+            title_text_font_size = "12pt",
+        x_axis_label= 'Fibonacci term number', y_axis_label='Matching Digits', tools = [hover])
     s2.circle(x_phi, y_phi, size=15, color='black', alpha=0.5) 
 
-    #Put plots in an HBox
-    p = hplot(s1, s2)
+    # create Fibonacci spiral plot
+    # first, get n squares
+    b, l, t, r = get_n_squares(args.integer)
+
+    #then, make sure the ranges of the axes are proper length
+    x_low, x_hi, y_low, y_hi = get_axis_range(args.integer)
+
+    # add in the golden spiral
+    x_zero, y_zero, x_one, y_one, cx_zero, cy_zero, cx_one, cy_one = get_spiral_coord(args.integer)
+
+    # and Bokeh the shit out of it all!
+    s3 = figure(width = 400, height = 400, x_range = (x_low, x_hi), y_range = (y_low, y_hi),\
+            title="The Golden Spiral", title_text_font_size = "12pt")
+    s3.quad(bottom = b, left = l, top = t, right = r, color = 'white', alpha = 1.0, line_color = 'black', line_width = 3)
+    s3.bezier(x0 = x_zero, y0 = y_zero, x1 = x_one, y1 = y_one,  cx0 = cx_zero, cy0 = cy_zero, cx1 = cx_one, cy1 = cy_one)
+
+    #Put plots in an HBox ('H' stands for Horizontal)
+    p = hplot(s1, s2, s3)
 
     #show results
     show(p)
@@ -81,9 +108,10 @@ else:
         .format(int(args.integer))
     print prime_list(args.integer)
     print ""
-    print "The value of the quotient of the last two terms in the sequence is: {}"\
-        .format(float(y_fib[args.integer]) / float(y_fib[args.integer - 1]))
+    print "The value of the quotient of the last two terms in the sequence is:\
+            {}".format(float(y_fib[args.integer]) / float(y_fib[args.integer - 1]))
     print "The true value of phi is: {}".format(phi)
     print ""
-    print "The quotient of the last two terms of the sequence match the true value of phi out to {} digits."\
+    print "The quotient of the last two terms of the sequence\
+            match the true value of phi out to {} digits."\
         .format(phi_compare(args.integer))
